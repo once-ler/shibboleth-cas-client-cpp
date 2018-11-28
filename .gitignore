@@ -1,0 +1,62 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+/x64
+/Debug
+epic-interconnect-client-cpp.opensdf
+epic-interconnect-client-cpp.sdf
+epic-interconnect-client-cpp.v12.suo
+config.json
+mapping.json
+/log
+out.csv
+/samples
+test.cpp
+/scripts
+
+*.xml
+*.js
+*.csv
+*.tsv
+*.xlsx
+*.sql
+
+BULK
+
+*.VC.db
+*.VC.opendb
+
+scripts/
+data/
+
+**/build/
+**/intermediate/
+**/config.json
+
+**/prototype
