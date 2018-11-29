@@ -1,7 +1,9 @@
 #pragma once
 
+#include <fstream>
 #include "rxweb/src/rxweb.hpp"
 #include "rxweb/src/server.hpp"
+#include "fmt/format.h"
 
 using json = nlohmann::json;
 using WebTask = rxweb::task<SimpleWeb::HTTP>;

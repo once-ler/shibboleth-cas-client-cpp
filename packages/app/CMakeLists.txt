@@ -30,6 +30,7 @@ set(SIMPLE_WEBSOCKET_SERVER ${PROJECT_SOURCE_DIR}/../../../Simple-WebSocket-Serv
 #set(SPDLOG ${PROJECT_SOURCE_DIR}/../../spdlog/include)
 #set(TDSPP ${PROJECT_SOURCE_DIR}/../../tdspp)
 #set(CSV ${PROJECT_SOURCE_DIR}/../../fast-cpp-csv-parser)
+set(FMT ${PROJECT_SOURCE_DIR}/../../../fmt/include)
 
 include_directories(
   /usr/local/
@@ -39,6 +40,7 @@ include_directories(
   "${SIMPLE_WEB_SERVER}" 
   "${SIMPLE_WEBSOCKET_SERVER}"
   "${JSON}"
+  "${FMT}"
 )
 
 link_directories(  
@@ -56,4 +58,4 @@ target_link_libraries(
   OpenSSL::SSL  
 )
 
-# file(COPY "${PROJECT_SOURCE_DIR}/../resources" DESTINATION ${CMAKE_BINARY_DIR}/bin)
+file(COPY "${PROJECT_SOURCE_DIR}/../../resources" DESTINATION ${CMAKE_BINARY_DIR}/bin)

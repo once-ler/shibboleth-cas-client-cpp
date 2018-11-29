@@ -9,12 +9,11 @@ using namespace shibboleth::cas::route;
 
 namespace shibboleth::cas::server {
 
-  static string version = "0.1.0";
+  static string version = "0.1.1";
 
-  json config_j;
   int threads = 4, port = 3000;
 
-  auto start = [] {
+  auto start = [](const json& config_j) {
 
     rxweb::server<SimpleWeb::HTTP> server(port, threads);
 
@@ -26,8 +25,8 @@ namespace shibboleth::cas::server {
     };
     
     server.middlewares = {
-      casAuth(server),
-      validateTicket(server)
+      casAuth(server, config_j),
+      validateTicket(server, config_j)
     };
     
     std::thread server_thread([&server]() {

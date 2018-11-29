@@ -1,0 +1,4 @@
+{
+  "serviceProvider": "https://localhost:8443",
+  "finalDest": "http://localhost:3000/validate"
+}
