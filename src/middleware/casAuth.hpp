@@ -10,6 +10,7 @@ namespace shibboleth::cas::middleware {
     return {
       [](const rxweb::task<T>& t) { return (t.type == "CAS_AUTH"); },
       [&](const rxweb::task<T>& t) {
+        SimpleWeb::CaseInsensitiveMultimap header;
         string serviceProvider = config_j.value("serviceProvider", "");
         string finalDest = config_j.value("finalDest", "");
 
@@ -17,8 +18,10 @@ namespace shibboleth::cas::middleware {
           serviceProvider,
           finalDest          
         );
-
-        cout << uri << endl; 
+        
+        header.emplace("Location", uri);
+        
+        t.response->write(SimpleWeb::StatusCode::redirection_found, header);
       }
     };
 

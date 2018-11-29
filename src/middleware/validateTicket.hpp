@@ -2,6 +2,8 @@
 
 #include "shibboleth-cas-client-cpp/src/common/util.hpp"
 
+using namespace shibboleth::cas::common; 
+
 namespace shibboleth::cas::middleware {
   
   template<typename T>
@@ -20,13 +22,17 @@ namespace shibboleth::cas::middleware {
         string serviceProvider = config_j.value("serviceProvider", "");
         string finalDest = config_j.value("finalDest", "");
 
-        const string uri = fmt::format("{0}/cas/serviceValidate?service={1}&ticket={2}",
+        string uri = fmt::format("{0}/cas/serviceValidate?service={1}&ticket={2}",
           serviceProvider,
           finalDest,
           ticket
         );
 
-        cout << uri << endl;
+        auto j = apiCall(uri, "GET");
+
+        SimpleWeb::CaseInsensitiveMultimap header{{"Content-Type", "application/json"}};
+        t.response->write(SimpleWeb::StatusCode::success_ok, j.dump(2), header);
+
       }
     };
 

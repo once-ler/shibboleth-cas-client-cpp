@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(shibboleth-cas-client VERSION 0.4.3 LANGUAGES C CXX)
+project(shibboleth-cas-client VERSION 0.2.1 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,21 +16,14 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(OpenSSL)
 find_package(Threads)
 find_package(Boost 1.62.0 COMPONENTS thread date_time program_options filesystem system regex REQUIRED)
-#find_package(PostgreSQL REQUIRED)
 
-#set(HL7PARSER ${PROJECT_SOURCE_DIR}/../../hl7parser-json/include)
 set(RXCPP ${PROJECT_SOURCE_DIR}/../../../RxCpp/Rx/v2/src)
-#set(JSON_OLD ${PROJECT_SOURCE_DIR}/../../json/single_include)
 set(JSON ${PROJECT_SOURCE_DIR}/../../../json/single_include/nlohmann)
 set(RXWEB ${PROJECT_SOURCE_DIR}/../../../rx-web-cpp)
 set(SIMPLE_WEB_SERVER ${PROJECT_SOURCE_DIR}/../../../Simple-Web-Server)
 set(SIMPLE_WEBSOCKET_SERVER ${PROJECT_SOURCE_DIR}/../../../Simple-WebSocket-Server)
-#set(LIBPQMXX ${PROJECT_SOURCE_DIR}/../../libpqmxx/include)
-#set(STORE ${PROJECT_SOURCE_DIR}/../../Store-cpp)
-#set(SPDLOG ${PROJECT_SOURCE_DIR}/../../spdlog/include)
-#set(TDSPP ${PROJECT_SOURCE_DIR}/../../tdspp)
-#set(CSV ${PROJECT_SOURCE_DIR}/../../fast-cpp-csv-parser)
-set(FMT ${PROJECT_SOURCE_DIR}/../../../fmt/include)
+set(SPDLOG ${PROJECT_SOURCE_DIR}/../../../spdlog/include)
+set(CURLPP ${PROJECT_SOURCE_DIR}/../../../curlpp/include)
 
 include_directories(
   /usr/local/
@@ -40,7 +33,8 @@ include_directories(
   "${SIMPLE_WEB_SERVER}" 
   "${SIMPLE_WEBSOCKET_SERVER}"
   "${JSON}"
-  "${FMT}"
+  "${SPDLOG}"
+  "${CURLPP}"
 )
 
 link_directories(  
@@ -55,7 +49,9 @@ target_link_libraries(
   ${Boost_LIBRARIES} 
   Threads::Threads 
   OpenSSL::Crypto 
-  OpenSSL::SSL  
+  OpenSSL::SSL
+  curlpp
+  curl
 )
 
 file(COPY "${PROJECT_SOURCE_DIR}/../../resources" DESTINATION ${CMAKE_BINARY_DIR}/bin)

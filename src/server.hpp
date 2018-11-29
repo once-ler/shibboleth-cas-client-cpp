@@ -9,7 +9,7 @@ using namespace shibboleth::cas::route;
 
 namespace shibboleth::cas::server {
 
-  static string version = "0.1.1";
+  static string version = "0.2.1";
 
   int threads = 4, port = 3000;
 
@@ -36,6 +36,8 @@ namespace shibboleth::cas::server {
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
     cout << "Listening on port: " << port << endl;
+
+    server_thread.join();
   };
 
 }
