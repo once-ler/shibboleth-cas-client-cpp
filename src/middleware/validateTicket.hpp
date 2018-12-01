@@ -30,6 +30,8 @@ namespace shibboleth::cas::middleware {
 
         auto j = apiCall(uri, "GET");
 
+        parseValidationResponse(j);
+        
         SimpleWeb::CaseInsensitiveMultimap header{{"Content-Type", "application/json"}};
         t.response->write(SimpleWeb::StatusCode::success_ok, j.dump(2), header);
 

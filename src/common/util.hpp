@@ -5,9 +5,41 @@
 #include "rxweb/src/server.hpp"
 #include "spdlog/fmt/fmt.h"
 #include "shibboleth-cas-client-cpp/src/common/apiCall.hpp"
+#include "pugixml.hpp"
 
 using json = nlohmann::json;
 using WebTask = rxweb::task<SimpleWeb::HTTP>;
 using SocketType = SimpleWeb::ServerBase<SimpleWeb::HTTP>;
 using HTTPRequest = std::shared_ptr<SocketType::Request>;
 using HTTPResponse = std::shared_ptr<SocketType::Response>;
+
+namespace shibboleth::cas::common {
+
+  auto parseValidationResponse = [](json& j) {
+
+    string p{"/cas:serviceResponse/cas:authenticationSuccess/cas:user"};
+        
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_string(j["response"].get<string>().c_str());
+
+    if (result) {
+      try {
+        pugi::xpath_node user = doc.select_node(p.c_str());
+        if (user) {
+          j["user"] = user.node().child_value();
+        } else {
+          j["error"] = "Unauthorized";  
+        }
+      } catch (const pugi::xpath_exception& e) {
+        j["error"] = e.what();
+      } catch (...) {
+        j["error"] = "Unexpected error";
+      }
+    } else {
+      j["error"] = "Couldn't parse xml string";
+    }
+
+    return j;
+  };
+
+}

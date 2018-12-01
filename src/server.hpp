@@ -9,7 +9,7 @@ using namespace shibboleth::cas::route;
 
 namespace shibboleth::cas::server {
 
-  static string version = "0.2.1";
+  static string version = "0.2.2";
 
   int threads = 4, port = 3000;
 

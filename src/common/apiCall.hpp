@@ -46,7 +46,7 @@ namespace shibboleth::cas::common {
     request.setOpt(ws);
 
     try {
-      j["request"] = data;
+      j["request"] = data.size() == 0 ? url : data;
 
       request.perform();
       

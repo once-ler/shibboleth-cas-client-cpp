@@ -24,6 +24,7 @@ set(SIMPLE_WEB_SERVER ${PROJECT_SOURCE_DIR}/../../../Simple-Web-Server)
 set(SIMPLE_WEBSOCKET_SERVER ${PROJECT_SOURCE_DIR}/../../../Simple-WebSocket-Server)
 set(SPDLOG ${PROJECT_SOURCE_DIR}/../../../spdlog/include)
 set(CURLPP ${PROJECT_SOURCE_DIR}/../../../curlpp/include)
+set(PUGIXML ${PROJECT_SOURCE_DIR}/../../../pugixml/src)
 
 include_directories(
   /usr/local/
@@ -35,6 +36,7 @@ include_directories(
   "${JSON}"
   "${SPDLOG}"
   "${CURLPP}"
+  "${PUGIXML}"
 )
 
 link_directories(  
@@ -52,6 +54,7 @@ target_link_libraries(
   OpenSSL::SSL
   curlpp
   curl
+  pugixml
 )
 
 file(COPY "${PROJECT_SOURCE_DIR}/../../resources" DESTINATION ${CMAKE_BINARY_DIR}/bin)
