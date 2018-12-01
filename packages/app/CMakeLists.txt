@@ -25,6 +25,8 @@ set(SIMPLE_WEBSOCKET_SERVER ${PROJECT_SOURCE_DIR}/../../../Simple-WebSocket-Serv
 set(SPDLOG ${PROJECT_SOURCE_DIR}/../../../spdlog/include)
 set(CURLPP ${PROJECT_SOURCE_DIR}/../../../curlpp/include)
 set(PUGIXML ${PROJECT_SOURCE_DIR}/../../../pugixml/src)
+set(CPPJWT ${PROJECT_SOURCE_DIR}/../../../cpp-jwt/include)
+set(OSSPUUID ${PROJECT_SOURCE_DIR}/../../../ossp-uuid)
 
 include_directories(
   /usr/local/
@@ -37,6 +39,7 @@ include_directories(
   "${SPDLOG}"
   "${CURLPP}"
   "${PUGIXML}"
+  "${CPPJWT}"
 )
 
 link_directories(  
@@ -55,6 +58,7 @@ target_link_libraries(
   curlpp
   curl
   pugixml
+  uuid
 )
 
 file(COPY "${PROJECT_SOURCE_DIR}/../../resources" DESTINATION ${CMAKE_BINARY_DIR}/bin)
