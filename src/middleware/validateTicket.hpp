@@ -31,6 +31,10 @@ namespace shibboleth::cas::middleware {
         auto j = apiCall(uri, "GET");
 
         parseValidationResponse(j);
+
+        auto enc_str = createJwt(j);
+
+        cout << enc_str << endl;
         
         SimpleWeb::CaseInsensitiveMultimap header{{"Content-Type", "application/json"}};
         t.response->write(SimpleWeb::StatusCode::success_ok, j.dump(2), header);

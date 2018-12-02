@@ -8,9 +8,9 @@
 #include "shibboleth-cas-client-cpp/src/common/apiCall.hpp"
 #include "pugixml.hpp"
 #include "jwt/jwt.hpp"
-#include "uuid.hh"
+#include "shibboleth-cas-client-cpp/src/common/uuid.hxx"
 
-using json = nlohmann::json;
+// using json = nlohmann::json;
 using WebTask = rxweb::task<SimpleWeb::HTTP>;
 using SocketType = SimpleWeb::ServerBase<SimpleWeb::HTTP>;
 using HTTPRequest = std::shared_ptr<SocketType::Request>;
@@ -22,7 +22,7 @@ namespace shibboleth::cas::common {
     std::chrono::system_clock::time_point timePoint;
     std::time_t epochTime;
     std::string timeString;
-  }
+  };
 
   auto parseValidationResponse = [](json& j) {
 
@@ -77,33 +77,46 @@ namespace shibboleth::cas::common {
   auto getExpirationTime = [](int num_hr) {
     auto exp = std::chrono::system_clock::now() + std::chrono::hours{num_hr};
     std::time_t exp_time = std::chrono::system_clock::to_time_t(exp); 
-    string ts = std::put_time(std::localtime(&exp_time), "%F %T");
+    string ts = "";
+    char str[100];
+    if (std::strftime(str, sizeof(str), "%F %T", std::localtime(&exp_time))) {
+      ts.assign(str);
+    }
     
     return Time{ exp, exp_time, ts };
-  }
+  };
 
-  auto createJwt = [](const json& j) {
+  auto createJwt = [](json& j) -> string {
     if (j["user"].is_null())
-      return j;
+      return "";
+
+    using namespace jwt::params;
 
     auto user = j["user"].get<string>();
+    auto key = generate_uuid();
     auto shhh = generate_uuid();
     auto et = getExpirationTime(24);
 
+    j["key"] = key;
     j["secret"] = shhh;
     j["expire"] = static_cast<int64_t>(et.epochTime * 1000);
     j["expire_ts"] = et.timeString; 
-    j["user_id"] = generate_uuid_v3(user.c_str());
+    j["user_uuid"] = generate_uuid_v3(user.c_str());
 
-    jwt::jwt_object obj{algorithm("hs256"), secret(shhh),
-      payload(
-        {
-          { "iss", "shibboleth::cas" },
-          { "exp", et.timePoint },
-          { "user", user }
-        }
-      )}
+    jwt::jwt_object obj{
+      algorithm("hs256"), 
+      payload({
+        { "iss", "shibboleth::cas" },
+        // { "exp", et.timePoint },
+        { "user", user }
+      }),
+      secret(shhh)      
+    };
 
-  }
+    obj.add_claim("exp", et.timePoint);
+    obj.header().add_header("key", key);
+
+    return obj.signature();
+  };
 
 }

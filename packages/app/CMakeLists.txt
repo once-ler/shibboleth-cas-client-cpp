@@ -26,7 +26,6 @@ set(SPDLOG ${PROJECT_SOURCE_DIR}/../../../spdlog/include)
 set(CURLPP ${PROJECT_SOURCE_DIR}/../../../curlpp/include)
 set(PUGIXML ${PROJECT_SOURCE_DIR}/../../../pugixml/src)
 set(CPPJWT ${PROJECT_SOURCE_DIR}/../../../cpp-jwt/include)
-set(OSSPUUID ${PROJECT_SOURCE_DIR}/../../../ossp-uuid)
 
 include_directories(
   /usr/local/
@@ -42,7 +41,8 @@ include_directories(
   "${CPPJWT}"
 )
 
-link_directories(  
+link_directories(
+  /usr/local/lib
 )
 
 file(GLOB_RECURSE CPP_SOURCES "${PROJECT_SOURCE_DIR}/index.cpp")
