@@ -25,6 +25,7 @@ set(SIMPLE_WEBSOCKET_SERVER ${PROJECT_SOURCE_DIR}/../../../Simple-WebSocket-Serv
 set(SPDLOG ${PROJECT_SOURCE_DIR}/../../../spdlog/include)
 set(CURLPP ${PROJECT_SOURCE_DIR}/../../../curlpp/include)
 set(PUGIXML ${PROJECT_SOURCE_DIR}/../../../pugixml/src)
+set(STORE ${PROJECT_SOURCE_DIR}/../../../Store-cpp)
 set(CPPJWT ${PROJECT_SOURCE_DIR}/../../../cpp-jwt/include)
 set(CPPREDIS ${PROJECT_SOURCE_DIR}/../../../cpp_redis/includes)
 
@@ -39,6 +40,7 @@ include_directories(
   "${SPDLOG}"
   "${CURLPP}"
   "${PUGIXML}"
+  "${STORE}"
   "${CPPJWT}"
   "${CPPREDIS}"
 )
