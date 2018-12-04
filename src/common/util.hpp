@@ -5,12 +5,13 @@
 #include "rxweb/src/rxweb.hpp"
 #include "rxweb/src/server.hpp"
 #include "spdlog/fmt/fmt.h"
-#include "shibboleth-cas-client-cpp/src/common/apiCall.hpp"
 #include "pugixml.hpp"
 #include "jwt/jwt.hpp"
+#include <cpp_redis/cpp_redis>
+#include "shibboleth-cas-client-cpp/src/common/apiCall.hpp"
 #include "shibboleth-cas-client-cpp/src/common/uuid.hxx"
 
-// using json = nlohmann::json;
+using json = nlohmann::json;
 using WebTask = rxweb::task<SimpleWeb::HTTP>;
 using SocketType = SimpleWeb::ServerBase<SimpleWeb::HTTP>;
 using HTTPRequest = std::shared_ptr<SocketType::Request>;
@@ -117,6 +118,11 @@ namespace shibboleth::cas::common {
     obj.header().add_header("key", key);
 
     return obj.signature();
+  };
+
+  // header: x-access-token
+  auto decryptJwt = [](string key, string enc_str) -> jwt::jwt_object {
+    return jwt::decode(enc_str, algorithms({"hs256"}), secret(key));
   };
 
 }
