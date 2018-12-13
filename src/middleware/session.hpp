@@ -10,10 +10,15 @@ namespace shibboleth::cas::middleware {
       [](const rxweb::task<T>& t) { return (t.type == "CREATE_SESSION"); },
       [](const rxweb::task<T>& t) {
         auto uri = t.data->value("uri", "");
+
+        // From post validation of the ticket.
         auto user = t.data->value("user", "");
 
         // Need to respond with error code.
-        if (user.size == 0 || uri.size == 0) return;
+        if (user.size == 0 || uri.size == 0) {
+          t.response->write(SimpleWeb::StatusCode::client_error_unauthorized);
+          return;
+        }
         
         SimpleWeb::CaseInsensitiveMultimap header;
         
@@ -37,15 +42,21 @@ namespace shibboleth::cas::middleware {
     return {
       [](const rxweb::task<T>& t) { return (t.type == "GET_SESSION"); },
       [](const rxweb::task<T>& t) {
-        // TODO: Should really read from header
-        auto enc_str = t.data->value("x-access-token", "");
 
-        // Need to respond with error code.
-        if (enc_str.size == 0) return;
-        
+        auto sidIt = t.request->header.find("sid");
+        auto encIt = t.request->header.find("x-access-token");
+        auto endIt = t.request->header.end();
+
+        if (sidIt == endIt || encIt == endIt) {
+          t.response->write(SimpleWeb::StatusCode::client_error_unauthorized);
+          return;
+        }
+
+        string sid = sidIt->second, enc_str = encIt->second;
+
         client.sessions.get(sid, enc_str, [](pair<string, shared_ptr<jwt::jwt_object>>& pa){
           if (pa.first.size() > 0) {
-            // cerr << pa.first << endl;
+            t.response->write(SimpleWeb::StatusCode::client_error_unauthorized);
             return;
           }
 
@@ -55,7 +66,12 @@ namespace shibboleth::cas::middleware {
           cout << obj.header() << endl;
           cout << obj.payload() << endl;
           */
-         
+
+          // Need to convert payload to string, parse to json, and then get user info.
+          /*
+          SimpleWeb::CaseInsensitiveMultimap header{{"Content-Type", "application/json"}};
+          t.response->write(SimpleWeb::StatusCode::success_ok, j.dump(2), header); 
+          */
         });
 
       }
