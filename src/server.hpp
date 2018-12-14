@@ -9,11 +9,12 @@ using namespace shibboleth::cas::route;
 
 namespace shibboleth::cas::server {
 
-  static string version = "0.2.9";
+  static string version = "0.2.10";
 
   int threads = 4, port = 3000;
 
   auto start = [](const json& config_j) {
+    auto client = RedisClient();
 
     rxweb::server<SimpleWeb::HTTP> server(port, threads);
 
@@ -26,7 +27,9 @@ namespace shibboleth::cas::server {
     
     server.middlewares = {
       casAuth(server, config_j),
-      validateTicket(server, config_j)
+      validateTicket(server, config_j),
+      createSession(server, client),
+      getSession(server, client)
     };
     
     std::thread server_thread([&server]() {

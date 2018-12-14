@@ -48,4 +48,36 @@ namespace shibboleth::cas::common {
     return j;
   };
 
+  template<typename A>
+  auto getFinalDestUrl = [](shared_ptr<typename SimpleWeb::ServerBase<A>::Request> request) {
+    string protocol = "https";
+    if (std::is_same<A, SimpleWeb::HTTP>::value == true) {
+      protocol = "http";
+    }
+
+    auto queries = request->parse_query_string();
+
+    string uri_req = "";
+    auto it = queries.find("redirect");
+    if (it != queries.end())
+      uri_req = it->second;
+    else
+      uri_req = protocol + "://localhost:3000/session";
+
+    return protocol + "://localhost:3000/validate?redirect=" + uri_req;
+
+  };
+
+  template<typename A>
+  auto getQueryStringVal = [](shared_ptr<typename SimpleWeb::ServerBase<A>::Request> request, string key) {
+    auto queries = request->parse_query_string();
+
+    string val = "";
+    auto it = queries.find(key);
+    if (it != queries.end())
+      val = it->second;
+
+    return val;
+  };
+
 }

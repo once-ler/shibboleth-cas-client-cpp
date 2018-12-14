@@ -12,15 +12,12 @@ namespace shibboleth::cas::middleware {
     return {
       [](const rxweb::task<T>& t) { return (t.type == "VALIDATE_TICKET"); },
       [&](const rxweb::task<T>& t) {
-        auto queries = t.request->parse_query_string();
-
-        string ticket = "";
-        auto it = queries.find("ticket");
-        if (it != queries.end())
-          ticket = it->second;
+        auto ticket = getQueryStringVal<T>(t.request, "ticket");
+        auto redirect = getQueryStringVal<T>(t.request, "redirect"); 
 
         string serviceProvider = config_j.value("serviceProvider", "");
-        string finalDest = config_j.value("finalDest", "");
+        string finalDest = getFinalDestUrl<T>(t.request);
+cout << finalDest << endl;
 
         string uri = fmt::format("{0}/cas/serviceValidate?service={1}&ticket={2}",
           serviceProvider,
@@ -34,6 +31,8 @@ namespace shibboleth::cas::middleware {
 
         auto enc_str = createJwt(j);
 
+        j["uri"] = redirect;
+cout << j.dump(2) << endl;
         auto nextTask = t;
         *(nextTask.data) = j;
         nextTask.type = "CREATE_SESSION";

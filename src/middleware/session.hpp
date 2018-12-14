@@ -3,19 +3,20 @@
 #include "shibboleth-cas-client-cpp/src/common/util.hpp"
 
 namespace shibboleth::cas::middleware {
+
+  // test: http://localhost:3000/auth?redirect=http://localhost:4000/welcome
   template<typename T>
   rxweb::middleware<T> createSession(rxweb::server<T>& server, store::storage::redis::Client& client) {
     
     return {
       [](const rxweb::task<T>& t) { return (t.type == "CREATE_SESSION"); },
-      [](const rxweb::task<T>& t) {
-        auto uri = t.data->value("uri", "");
+      [&](const rxweb::task<T>& t) {
+        auto j = *(t.data);
+        cout << j.dump(2) << endl;
+        string uri = j["uri"];
+        auto user = j.value("user", "");
 
-        // From post validation of the ticket.
-        auto user = t.data->value("user", "");
-
-        // Need to respond with error code.
-        if (user.size == 0 || uri.size == 0) {
+        if (user.size() == 0) {
           t.response->write(SimpleWeb::StatusCode::client_error_unauthorized);
           return;
         }
@@ -41,7 +42,7 @@ namespace shibboleth::cas::middleware {
     
     return {
       [](const rxweb::task<T>& t) { return (t.type == "GET_SESSION"); },
-      [](const rxweb::task<T>& t) {
+      [&](const rxweb::task<T>& t) {
 
         auto sidIt = t.request->header.find("sid");
         auto encIt = t.request->header.find("x-access-token");
@@ -54,11 +55,13 @@ namespace shibboleth::cas::middleware {
 
         string sid = sidIt->second, enc_str = encIt->second;
 
-        client.sessions.get(sid, enc_str, [](pair<string, shared_ptr<jwt::jwt_object>>& pa){
+        client.sessions.get(sid, enc_str, [&t](pair<string, shared_ptr<jwt::jwt_object>>& pa){
           if (pa.first.size() > 0) {
             t.response->write(SimpleWeb::StatusCode::client_error_unauthorized);
             return;
           }
+
+          t.response->write(SimpleWeb::StatusCode::success_ok, "Authorized!");
 
           /*
           // Valid user

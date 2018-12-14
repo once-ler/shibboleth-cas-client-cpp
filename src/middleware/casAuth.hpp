@@ -2,6 +2,8 @@
 
 #include "shibboleth-cas-client-cpp/src/common/util.hpp"
 
+using namespace shibboleth::cas::common;
+
 namespace shibboleth::cas::middleware {
   
   template<typename T>
@@ -12,8 +14,8 @@ namespace shibboleth::cas::middleware {
       [&](const rxweb::task<T>& t) {
         SimpleWeb::CaseInsensitiveMultimap header;
         string serviceProvider = config_j.value("serviceProvider", "");
-        string finalDest = config_j.value("finalDest", "");
-
+        string finalDest = getFinalDestUrl<T>(t.request);
+cout << finalDest << endl;
         const string uri = fmt::format("{0}/cas/login?service={1}",
           serviceProvider,
           finalDest          
