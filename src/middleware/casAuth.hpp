@@ -14,9 +14,9 @@ namespace shibboleth::cas::middleware {
       [&](const rxweb::task<T>& t) {
         SimpleWeb::CaseInsensitiveMultimap header;
         string serviceProvider = config_j.value("serviceProvider", "");
-        string finalDest = getFinalDestUrl<T>(t.request);
-cout << finalDest << endl;
-        const string uri = fmt::format("{0}/cas/login?service={1}",
+        string finalDest = getFinalDestUrl<T>(t.request, config_j);
+
+        const string uri = fmt::format("{0}/cas/login?service={1}&renew=true",
           serviceProvider,
           finalDest          
         );

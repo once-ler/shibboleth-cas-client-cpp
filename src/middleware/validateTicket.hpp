@@ -16,8 +16,7 @@ namespace shibboleth::cas::middleware {
         auto redirect = getQueryStringVal<T>(t.request, "redirect"); 
 
         string serviceProvider = config_j.value("serviceProvider", "");
-        string finalDest = getFinalDestUrl<T>(t.request);
-cout << finalDest << endl;
+        string finalDest = getFinalDestUrl<T>(t.request, config_j);
 
         string uri = fmt::format("{0}/cas/serviceValidate?service={1}&ticket={2}",
           serviceProvider,
@@ -32,7 +31,7 @@ cout << finalDest << endl;
         auto enc_str = createJwt(j);
 
         j["uri"] = redirect;
-cout << j.dump(2) << endl;
+
         auto nextTask = t;
         *(nextTask.data) = j;
         nextTask.type = "CREATE_SESSION";

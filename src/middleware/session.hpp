@@ -12,7 +12,7 @@ namespace shibboleth::cas::middleware {
       [](const rxweb::task<T>& t) { return (t.type == "CREATE_SESSION"); },
       [&](const rxweb::task<T>& t) {
         auto j = *(t.data);
-        cout << j.dump(2) << endl;
+        
         string uri = j["uri"];
         auto user = j.value("user", "");
 
@@ -50,7 +50,8 @@ namespace shibboleth::cas::middleware {
         auto endIt = t.request->header.end();
 
         if (sidIt == endIt || encIt == endIt) {
-          t.response->write(SimpleWeb::StatusCode::client_error_unauthorized);
+          cout << "Denied!" << endl;
+          sendAccessDenied<T>(t.response);
           return;
         }
 
@@ -58,24 +59,22 @@ namespace shibboleth::cas::middleware {
 
         client.sessions.get(sid, enc_str, [&t](pair<string, shared_ptr<jwt::jwt_object>>& pa){
           if (pa.first.size() > 0) {
-            t.response->write(SimpleWeb::StatusCode::client_error_unauthorized);
+            sendAccessDenied<T>(t.response);
             return;
           }
 
-          t.response->write(SimpleWeb::StatusCode::success_ok, "Authorized!");
-
-          /*
-          // Valid user
           auto obj = *(pa.second);
-          cout << obj.header() << endl;
-          cout << obj.payload() << endl;
-          */
 
-          // Need to convert payload to string, parse to json, and then get user info.
-          /*
-          SimpleWeb::CaseInsensitiveMultimap header{{"Content-Type", "application/json"}};
-          t.response->write(SimpleWeb::StatusCode::success_ok, j.dump(2), header); 
-          */
+          ostringstream oss;
+          oss << obj.payload();
+
+          auto j = json::parse(oss.str());
+          auto j_str = j.dump(2);
+
+          SimpleWeb::CaseInsensitiveMultimap header{
+            {"Content-Type", "application/json"}
+          };          
+          t.response->write(SimpleWeb::StatusCode::success_ok, j_str, header);
         });
 
       }

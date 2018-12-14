@@ -49,22 +49,28 @@ namespace shibboleth::cas::common {
   };
 
   template<typename A>
-  auto getFinalDestUrl = [](shared_ptr<typename SimpleWeb::ServerBase<A>::Request> request) {
+  auto getFinalDestUrl = [](shared_ptr<typename SimpleWeb::ServerBase<A>::Request> request, const json& config_j) {
     string protocol = "https";
     if (std::is_same<A, SimpleWeb::HTTP>::value == true) {
       protocol = "http";
     }
 
     auto queries = request->parse_query_string();
+    string host = config_j.value("host", "localhost");
+    int port = config_j.value("port", 3000);
 
     string uri_req = "";
     auto it = queries.find("redirect");
     if (it != queries.end())
       uri_req = it->second;
     else
-      uri_req = protocol + "://localhost:3000/session";
+      uri_req = fmt::format("{}://{}:{}/session",
+        protocol, host, port          
+      );    
 
-    return protocol + "://localhost:3000/validate?redirect=" + uri_req;
+    return fmt::format("{}://{}:{}/validate?redirect=",
+      protocol, host, port, uri_req     
+    );
 
   };
 
@@ -78,6 +84,16 @@ namespace shibboleth::cas::common {
       val = it->second;
 
     return val;
+  };
+
+  template<typename A>
+  auto sendAccessDenied = [](shared_ptr<typename SimpleWeb::ServerBase<A>::Response> response) {
+    string text = "Access Denied!";
+    SimpleWeb::CaseInsensitiveMultimap header{
+      {"Content-Type", "text/plain"}
+    };          
+    
+    response->write(SimpleWeb::StatusCode::client_error_unauthorized, text, header);
   };
 
 }

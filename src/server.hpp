@@ -9,12 +9,14 @@ using namespace shibboleth::cas::route;
 
 namespace shibboleth::cas::server {
 
-  static string version = "0.2.11";
+  static string version = "0.2.12";
+  static int defaultPort = 3000;
 
-  int threads = 4, port = 3000;
+  int threads = 4;
 
   auto start = [](const json& config_j) {
     auto client = RedisClient();
+    int port = config_j.value("port", defaultPort);
 
     rxweb::server<SimpleWeb::HTTP> server(port, threads);
 
