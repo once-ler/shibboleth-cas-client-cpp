@@ -45,12 +45,34 @@ namespace shibboleth::cas::middleware {
       [](const rxweb::task<T>& t) { return (t.type == "GET_SESSION"); },
       [&](const rxweb::task<T>& t) {
 
-        auto sidIt = t.request->header.find("sid");
-        auto encIt = t.request->header.find("x-access-token");
+        // for(auto& e: t.request->header)
+        //   cout << e.first << ": " << e.second;
+
+        auto cookieIt = t.request->header.find("Cookie");
         auto endIt = t.request->header.end();
 
+        if (cookieIt == endIt) {
+          sendAccessDenied<T>(t.response);
+          return;
+        }
+
+        cout << cookieIt->second << endl;
+
+        regex rgx("([^=]+)=([^\;]+);?\\s?", std::regex::ECMAScript|std::regex::icase);
+        // regex rgx("(\w+)=([^;]*)");
+        smatch m;
+
+        std::string::const_iterator text_iter = cookieIt->second.cbegin();
+        while (regex_search(text_iter, cookieIt->second.end(), m, rgx)) {
+          for(auto x: m) {
+            cout << x << endl;
+          }
+        }
+
+        auto sidIt = t.request->header.find("x-session-id");
+        auto encIt = t.request->header.find("x-access-token");
+        
         if (sidIt == endIt || encIt == endIt) {
-          cout << "Denied!" << endl;
           sendAccessDenied<T>(t.response);
           return;
         }
@@ -70,7 +92,7 @@ namespace shibboleth::cas::middleware {
 
           auto j = json::parse(oss.str());
           auto j_str = j.dump(2);
-
+cout << j_str << endl;
           SimpleWeb::CaseInsensitiveMultimap header{
             {"Content-Type", "application/json"}
           };          

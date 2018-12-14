@@ -24,7 +24,8 @@ namespace shibboleth::cas::server {
 
     server.routes = {
       auth(server, config_j),
-      validate(server, config_j)
+      validate(server, config_j),
+      session(server, config_j)
     };
     
     server.middlewares = {

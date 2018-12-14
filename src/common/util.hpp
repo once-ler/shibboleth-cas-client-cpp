@@ -64,11 +64,11 @@ namespace shibboleth::cas::common {
     if (it != queries.end())
       uri_req = it->second;
     else
-      uri_req = fmt::format("{}://{}:{}/session",
+      uri_req = fmt::format("{}://{}:{:d}/session",
         protocol, host, port          
       );    
 
-    return fmt::format("{}://{}:{}/validate?redirect=",
+    return fmt::format("{}://{}:{:d}/validate?redirect={}",
       protocol, host, port, uri_req     
     );
 
