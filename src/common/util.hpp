@@ -96,4 +96,28 @@ namespace shibboleth::cas::common {
     response->write(SimpleWeb::StatusCode::client_error_unauthorized, text, header);
   };
 
+  template<typename A>
+  auto getCookies = [](shared_ptr<typename SimpleWeb::ServerBase<A>::Request> request) {
+    SimpleWeb::CaseInsensitiveMultimap cookies{};
+
+    // header is CaseInsensitiveMultimap
+    auto cookieIt = request->header.find("cookie");
+    auto endIt = request->header.end();
+
+    if (cookieIt == endIt) {
+      return cookies;
+    }
+
+    string str = cookieIt->second;
+    regex rgx("([^=]+)=([^\;]+);?\\s?", std::regex::ECMAScript|std::regex::icase);
+    smatch res;
+
+    while (regex_search(str, res, rgx)) {
+      cookies.emplace(res[1], res[2]);
+      str = res.suffix();
+    }
+
+    return cookies;
+  };
+
 }
