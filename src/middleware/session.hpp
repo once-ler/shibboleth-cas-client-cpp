@@ -29,8 +29,9 @@ namespace shibboleth::cas::middleware {
 
         // Set header with session id and x-token, then redirect.
         header.emplace("Location", uri);
-        header.emplace("x-session-id", sid);
-        header.emplace("x-access-token", enc_str);
+        // Set-Cookie: ...; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Max-Age=8080
+        header.emplace("Set-Cookie", "x-session-id=" + sid + "; HttpOnly; Path=/; SameSite=Lax");
+        header.emplace("Set-Cookie", "x-access-token=" + enc_str + "; HttpOnly; Path=/; SameSite=Lax");
         
         t.response->write(SimpleWeb::StatusCode::redirection_found, header);  
       }
