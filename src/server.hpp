@@ -17,6 +17,7 @@ namespace shibboleth::cas::server {
   auto start = [](const json& config_j) {
     auto client = RedisClient();
     int port = config_j.value("port", defaultPort);
+    RS256KeyPair rs256KeyPair = tryGetRS256Key(config_j); 
 
     rxweb::server<SimpleWeb::HTTP> server(port, threads);
 
@@ -30,7 +31,7 @@ namespace shibboleth::cas::server {
     
     server.middlewares = {
       casAuth(server, config_j),
-      validateTicket(server, config_j),
+      validateTicket(server, config_j, rs256KeyPair),
       createSession(server, client),
       getSession(server, client)
     };

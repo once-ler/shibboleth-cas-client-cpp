@@ -7,7 +7,7 @@ using namespace shibboleth::cas::common;
 namespace shibboleth::cas::middleware {
   
   template<typename T>
-  rxweb::middleware<T> validateTicket(rxweb::server<T>& server,const json& config_j) {
+  rxweb::middleware<T> validateTicket(rxweb::server<T>& server,const json& config_j, const RS256KeyPair& rs256KeyPair) {
     
     return {
       [](const rxweb::task<T>& t) { return (t.type == "VALIDATE_TICKET"); },
@@ -17,7 +17,7 @@ namespace shibboleth::cas::middleware {
 
         string serviceProvider = config_j.value("serviceProvider", "");
         string finalDest = getFinalDestUrl<T>(t.request, config_j);
-
+        
         string uri = fmt::format("{0}/cas/serviceValidate?service={1}&ticket={2}",
           serviceProvider,
           finalDest,
@@ -27,6 +27,9 @@ namespace shibboleth::cas::middleware {
         auto j = apiCall(uri, "GET");
 
         parseValidationResponse(j);
+
+        // Asymmetric encryption will be used if private key is provided.
+        j["private_key"] = rs256KeyPair.privateKey;
 
         auto enc_str = createJwt(j);
 

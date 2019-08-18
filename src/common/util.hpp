@@ -9,6 +9,7 @@
 #include "shibboleth-cas-client-cpp/src/common/apiCall.hpp"
 #include "store.storage.redis/src/redis_client.hpp"
 #include "store.common/src/web_token.hpp"
+#include "store.common/src/file.hpp"
 
 using RedisClient = store::storage::redis::Client;
 using json = nlohmann::json;
@@ -118,6 +119,19 @@ namespace shibboleth::cas::common {
     }
 
     return cookies;
+  };
+
+  auto tryGetRS256Key = [](const json& config_j) -> RS256KeyPair {
+    RS256KeyPair rs256KeyPair;
+    string privateKeyFile = config_j.value("privateKeyFile", "");
+    string publicKeyFile = config_j.value("publicKeyFile", "");
+    // If private key location was provided in the config, read it and include it.
+    if (privateKeyFile.size() > 0 && publicKeyFile.size() > 0) {
+      auto privateKey = getFile(privateKeyFile);
+      auto publicKey = getFile(publicKeyFile);
+      rs256KeyPair = std::move(RS256KeyPair(privateKey, publicKey));
+    }
+    return rs256KeyPair;
   };
 
 }
