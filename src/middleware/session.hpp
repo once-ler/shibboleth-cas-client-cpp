@@ -26,6 +26,15 @@ namespace shibboleth::cas::middleware {
         string sid = j["sid"];
         string enc_str = j["signature"];
 
+        // Attach the token with the redirect uri.
+        string addTokenToUri = "x-access-token=" + enc_str;
+        if (uri.find("?") != string::npos) {
+          uri.append("&");
+        } else {
+          uri.append("?");
+        }
+        uri.append(addTokenToUri);
+
         // Set header with session id and x-token, then redirect.
         header.emplace("Location", uri);
         // Set-Cookie: ...; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Max-Age=8080
