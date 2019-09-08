@@ -50,7 +50,7 @@ namespace shibboleth::cas::common {
   };
 
   template<typename A>
-  auto getFinalDestUrl = [](shared_ptr<typename SimpleWeb::ServerBase<A>::Request> request, const json& config_j) {
+  auto getFinalDestUrl = [](shared_ptr<typename SimpleWeb::ServerBase<A>::Request> request, const json& config_j) -> std::pair<string, string> {
     string protocol = "https";
     if (std::is_same<A, SimpleWeb::HTTP>::value == true) {
       protocol = "http";
@@ -69,9 +69,9 @@ namespace shibboleth::cas::common {
         protocol, host, port          
       );    
 
-    return fmt::format("{}://{}:{:d}/validate?redirect={}",
+    return std::make_pair(fmt::format("{}://{}:{:d}/validate?redirect={}",
       protocol, host, port, uri_req     
-    );
+    ), uri_req);
 
   };
 
@@ -110,7 +110,7 @@ namespace shibboleth::cas::common {
     }
 
     string str = cookieIt->second;
-    regex rgx("([^=]+)=([^\;]+);?\\s?", std::regex::ECMAScript|std::regex::icase);
+    regex rgx("([^=]+)=([^\\;]+);?\\s?", std::regex::ECMAScript|std::regex::icase);
     smatch res;
 
     while (regex_search(str, res, rgx)) {

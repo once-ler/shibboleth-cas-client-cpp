@@ -16,11 +16,11 @@ namespace shibboleth::cas::middleware {
         auto redirect = getQueryStringVal<T>(t.request, "redirect"); 
 
         string serviceProvider = config_j.value("serviceProvider", "");
-        string finalDest = getFinalDestUrl<T>(t.request, config_j);
+        std::pair<string, string> finalDest = getFinalDestUrl<T>(t.request, config_j);
         
         string uri = fmt::format("{0}/cas/serviceValidate?service={1}&ticket={2}",
           serviceProvider,
-          finalDest,
+          finalDest.first,
           ticket
         );
 
