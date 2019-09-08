@@ -30,7 +30,7 @@ namespace shibboleth::cas::server {
     };
     
     server.middlewares = {
-      casAuth(server, config_j),
+      casAuth(server, config_j, rs256KeyPair),
       validateTicket(server, config_j, rs256KeyPair),
       createSession(server, client),
       getSession(server, client)
