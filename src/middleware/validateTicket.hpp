@@ -39,13 +39,7 @@ namespace shibboleth::cas::middleware {
         *(nextTask.data) = j;
         nextTask.type = "CREATE_SESSION";
         server.dispatch(nextTask);
-
-        /*
-        cout << enc_str << endl;
         
-        SimpleWeb::CaseInsensitiveMultimap header{{"Content-Type", "application/json"}};
-        t.response->write(SimpleWeb::StatusCode::success_ok, j.dump(2), header);
-        */
       }
     };
 
