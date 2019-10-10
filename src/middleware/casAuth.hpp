@@ -8,16 +8,28 @@ namespace shibboleth::cas::middleware {
   
   template<typename T>
   rxweb::middleware<T> casAuth(rxweb::server<T>& server, const json& config_j, const RS256KeyPair& rs256KeyPair) {
-    
     auto isAlreadyAuthenticatedWithRS256 = [](shared_ptr<typename SimpleWeb::ServerBase<T>::Request> request, const RS256KeyPair& rs256KeyPair, json& j) -> bool {
-      auto it = std::find_if(request->header.begin(), request->header.end(), [](auto& field) {
-        return field.first == "x-access-token";
-      });
+      string X_ACCESS_TOKEN = "x-access-token";
+      // Check querystring for token.
+      auto queries = request->parse_query_string();
+      auto it3 = queries.find(X_ACCESS_TOKEN);
+      if (it3 != queries.end()) {
+        return isRS256Authenticated(rs256KeyPair.publicKey, it3->second, j);
+      }
 
+      // Check header for token.
+      auto it = request->header.find(X_ACCESS_TOKEN);
       if (it != request->header.end() && rs256KeyPair.publicKey.size() > 0) {
         return isRS256Authenticated(rs256KeyPair.publicKey, it->second, j);
       }
 
+      // Check cookie for token.
+      auto cookies = getCookies<T>(request);
+      auto it2 = cookies.find(X_ACCESS_TOKEN);
+      if (it2 != cookies.end() && rs256KeyPair.publicKey.size() > 0) {
+        return isRS256Authenticated(rs256KeyPair.publicKey, it2->second, j);
+      }
+      
       return false;
     };
 

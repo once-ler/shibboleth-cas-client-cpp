@@ -30,6 +30,7 @@ namespace shibboleth::cas::middleware {
 
         // Asymmetric encryption will be used if private key is provided.
         j["private_key"] = rs256KeyPair.privateKey;
+        j["public_key"] = rs256KeyPair.publicKey;
 
         auto enc_str = createJwt(j);
 
