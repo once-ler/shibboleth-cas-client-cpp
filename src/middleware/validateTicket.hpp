@@ -26,6 +26,14 @@ namespace shibboleth::cas::middleware {
 
         auto j = apiCall(uri, "GET");
 
+        if (j.value("statusCode", 400) > 201) {
+          SimpleWeb::CaseInsensitiveMultimap header{
+            {"Content-Type", "text/html"}
+          };          
+          t.response->write(SimpleWeb::StatusCode::client_error_bad_request, j.value("response", "<h3>Bad Request</h3>"), header);
+          return;
+        }
+
         parseValidationResponse(j);
 
         // Asymmetric encryption will be used if private key is provided.

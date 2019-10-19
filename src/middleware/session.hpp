@@ -11,7 +11,7 @@ namespace shibboleth::cas::middleware {
       [](const rxweb::task<T>& t) { return (t.type == "CREATE_SESSION"); },
       [&](const rxweb::task<T>& t) {
         auto j = *(t.data);
-        
+      
         string uri = j["uri"];
         auto user = j.value("user", "");
 
@@ -40,7 +40,7 @@ namespace shibboleth::cas::middleware {
         // Set-Cookie: ...; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Max-Age=8080
         header.emplace("Set-Cookie", "x-session-id=" + sid + "; HttpOnly; Path=/; SameSite=Lax");
         header.emplace("Set-Cookie", "x-access-token=" + enc_str + "; HttpOnly; Path=/; SameSite=Lax");
-        
+
         t.response->write(SimpleWeb::StatusCode::redirection_found, header);  
       }
     };
